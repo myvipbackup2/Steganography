@@ -1,0 +1,19 @@
+{
+  "name": "steganography",
+  "version": "1.0.0",
+  "description": "图像加密",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myvipbackup2/Steganography.git"
+  },
+  "author": "lzx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/myvipbackup2/Steganography/issues"
+  },
+  "homepage": "https://github.com/myvipbackup2/Steganography#readme"
+}
