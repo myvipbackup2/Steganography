@@ -3,9 +3,53 @@
     <head>
         <meta charset="UTF-8">
         <title>图像加密</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="./index.css">
     </head>
     <body>
-        <script src="index.js"></script>
+        <h1 id="title">图像加密</h1>
+        <div id='about' class='section'>
+            <p>
+                我们知道图片的像素信息里存储着RGB的色值，R、G、B分别为该像素的红、绿、蓝通道，每个通道的分量值范围在0~255，16进制则是00~FF。
+                在CSS中经常使用其16进制形式，比如指定博客头部背景色为#A9D5F4。
+                其中R（红色）的16进制值为A9，换算成十进制为169。
+                这时候，对R分量的值+1，即为170，整个像素RGB值为#AAD5F4，别说你看不出差别，就连火眼金金的“像素眼”设计师都察觉不出来呢。
+                于此同时，修改G、B的分量值，也是我们无法察觉的。
+            </p>
+            <p>
+                因此可以得出重要结论：RGB分量值的小量变动，是肉眼无法分辨的，不影响对图片的识别。
+            </p>
+        </div>
+        <div id='main' class='section dark'>
+            <div class='step'>选择一张图片</div>
+            <img id='preview' class='preview hide' />
+            <div class='sectionbody'>
+                <input type='file' accept="image/*" id='file' class="btn" />
+            </div>
+        </div>
+        <div id='choose' class='section dark hide'>
+            <div class='step'>加密 / 解密信息</div>
+            <div class='sectionbody'>
+                <div class='left'>
+                <textarea id='message' class='message form-control' maxlength='1000'
+                          placeholder='请输入需要加密的信息'></textarea>
+                    <input type='password' id='password' class='password form-control'
+                           placeholder='密码 (可选项)' />
+                    <button id='encode' class='submit btn btn-primary'>加密</button>
+                </div>
+                <div class='right'>
+                    <input type='password' id='password2' class='password form-control'
+                           placeholder='请输入密码解密' />
+                    <button id='decode' class='submit btn btn-primary'>解密</button>
+                </div>
+            </div>
+        </div>
+        <div id='reveal' class='section dark hide'>
+            <div class='step'>隐藏的信息</div>
+            <div id='messageDecoded' class='sectionbody'></div>
+        </div>
+        <canvas id='canvas' class='hide'></canvas>
+        <img id='output' />
+        <script src="./index.js"></script>
     </body>
 </html>
