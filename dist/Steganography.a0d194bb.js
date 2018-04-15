@@ -531,7 +531,9 @@ var sjcl = require('./sjcl');
 window.onload = function () {
   // 注册图片输入事件
   var input = document.getElementById('file');
+  var input2 = document.getElementById('file2');
   input.addEventListener('change', importImage);
+  input2.addEventListener('change', importImage2);
 
   // 注册加密事件
   var encodeButton = document.getElementById('encode');
@@ -547,6 +549,10 @@ var maxMessageSize = 1011; // 测试下来hash后的最大值,相当于0.986kb�
 
 // 把图片放入canvas画布
 var importImage = function importImage(e) {
+
+  if (!e.target.files.length) {
+    return;
+  }
 
   var reader = new FileReader();
 
@@ -581,6 +587,32 @@ var importImage = function importImage(e) {
   reader.readAsDataURL(e.target.files[0]);
 };
 
+// 导入需要加密的图片
+var importImage2 = function importImage2(e) {
+
+  if (!e.target.files.length) {
+    return;
+  }
+
+  var reader = new FileReader();
+
+  reader.onload = function (_ref2) {
+    var target = _ref2.target;
+    var result = target.result;
+    // 图片预览
+
+    document.getElementById('preview2').style.display = 'block';
+    document.getElementById('preview2').src = result;
+    if (result.length > maxMessageSize) {
+      alert('被加密图片不能超过0.9Kb,否则加密后信息会丢失！');
+    } else {
+      document.getElementById('message').value = result;
+    }
+  };
+
+  reader.readAsDataURL(e.target.files[0]);
+};
+
 // 编码图像并保存
 var encode = function encode() {
   var message = document.getElementById('message').value;
@@ -605,7 +637,7 @@ var encode = function encode() {
 
   // 如果加密信息超过最大限制则终止
   if (message.length > maxMessageSize) {
-    alert('信息过大！');
+    alert('信息过大，会造成丢失！');
     return;
   }
 
@@ -638,6 +670,7 @@ var decode = function decode() {
 
     // 显示 加密 / 解密
     document.getElementById('choose').style.display = 'block';
+    document.getElementById('chooseImage').style.display = 'block';
     document.getElementById('reveal').style.display = 'none';
 
     if (password.length > 0) {
@@ -648,6 +681,7 @@ var decode = function decode() {
   // 显示解密按钮
   if (obj) {
     document.getElementById('choose').style.display = 'none';
+    document.getElementById('chooseImage').style.display = 'none';
     document.getElementById('reveal').style.display = 'block';
 
     // 必要时解密
@@ -805,7 +839,7 @@ var decodeMessage = function decodeMessage(colors, hash) {
 
   return message.join('');
 };
-},{"./sjcl":5}],12:[function(require,module,exports) {
+},{"./sjcl":5}],7:[function(require,module,exports) {
 
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -835,7 +869,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '53826' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '60521' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
@@ -974,5 +1008,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[12,3])
+},{}]},{},[7,3])
 //# sourceMappingURL=/Steganography.a0d194bb.map
