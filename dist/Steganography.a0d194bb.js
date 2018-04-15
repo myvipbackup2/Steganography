@@ -527,12 +527,21 @@ sjcl.json = { defaults: { v: 1, iter: 1E3, ks: 128, ts: 64, mode: "ccm", adata: 
 // 引入sjcl加密库
 var sjcl = require('./sjcl');
 
+var loading = document.getElementById('loading');
+
 // 初始化
 window.onload = function () {
+  loading.style.display = 'none';
+
   // 注册图片输入事件
   var input = document.getElementById('file');
   var input2 = document.getElementById('file2');
-  input.addEventListener('change', importImage);
+  input.addEventListener('change', function (e) {
+    loading.style.display = 'block';
+    setTimeout(function () {
+      importImage(e);
+    }, 20);
+  });
   input2.addEventListener('change', importImage2);
 
   // 注册加密事件
@@ -545,7 +554,7 @@ window.onload = function () {
 };
 
 // 限制文本大小
-var maxMessageSize = 1011; // 测试下来hash后的最大值,相当于0.986kb的数据
+var maxMessageSize = 1024 * 15;
 
 // 把图片放入canvas画布
 var importImage = function importImage(e) {
@@ -565,6 +574,7 @@ var importImage = function importImage(e) {
     document.getElementById('preview').src = target.result;
 
     // 清空所有输入
+    document.getElementById('file2').value = '';
     document.getElementById('message').value = '';
     document.getElementById('password').value = '';
     document.getElementById('password2').value = '';
@@ -604,10 +614,9 @@ var importImage2 = function importImage2(e) {
     document.getElementById('preview2').style.display = 'block';
     document.getElementById('preview2').src = result;
     if (result.length > maxMessageSize) {
-      alert('被加密图片不能超过0.9Kb,否则加密后信息会丢失！');
-    } else {
-      document.getElementById('message').value = result;
+      alert('被加密图片不要超过1Kb,否则加密时会严重卡顿，请不要操作！');
     }
+    document.getElementById('message').value = result;
   };
 
   reader.readAsDataURL(e.target.files[0]);
@@ -615,6 +624,8 @@ var importImage2 = function importImage2(e) {
 
 // 编码图像并保存
 var encode = function encode() {
+  console.time('encode');
+  loading.style.display = 'block';
   var message = document.getElementById('message').value;
   var password = document.getElementById('password').value;
   var output = document.getElementById('output');
@@ -647,6 +658,8 @@ var encode = function encode() {
   ctx.putImageData(imgData, 0, 0);
 
   output.src = canvas.toDataURL();
+  console.timeEnd('encode');
+  loading.style.display = 'none';
 
   // 加密成功
   alert('信息加密成功！右键另存为加密后的图像');
@@ -654,6 +667,8 @@ var encode = function encode() {
 
 // 如果有信息的话解密信息并展示
 var decode = function decode() {
+  loading.style.display = 'block';
+
   var password = document.getElementById('password2').value;
   var passwordFail = '密码不正确或没有加密的信息';
 
@@ -722,6 +737,7 @@ var decode = function decode() {
       content.innerHTML = escHtml(text);
     }
   }
+  loading.style.display = 'none';
 };
 
 // 返回位置中的二进制 0或1
@@ -839,7 +855,7 @@ var decodeMessage = function decodeMessage(colors, hash) {
 
   return message.join('');
 };
-},{"./sjcl":5}],7:[function(require,module,exports) {
+},{"./sjcl":5}],21:[function(require,module,exports) {
 
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -1008,5 +1024,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[7,3])
+},{}]},{},[21,3])
 //# sourceMappingURL=/Steganography.a0d194bb.map

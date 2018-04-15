@@ -1,12 +1,21 @@
 // 引入sjcl加密库
 const sjcl = require('./sjcl');
 
+const loading = document.getElementById('loading');
+
 // 初始化
 window.onload = function () {
+  loading.style.display = 'none';
+
   // 注册图片输入事件
   const input = document.getElementById('file');
   const input2 = document.getElementById('file2');
-  input.addEventListener('change', importImage);
+  input.addEventListener('change', function (e) {
+    loading.style.display = 'block';
+    setTimeout(() => {
+      importImage(e)
+    }, 20)
+  });
   input2.addEventListener('change', importImage2);
 
   // 注册加密事件
@@ -19,7 +28,7 @@ window.onload = function () {
 };
 
 // 限制文本大小
-const maxMessageSize = 1011; // 测试下来hash后的最大值,相当于0.986kb的数据
+const maxMessageSize = 1024 * 15;
 
 // 把图片放入canvas画布
 const importImage = function (e) {
@@ -37,6 +46,7 @@ const importImage = function (e) {
     document.getElementById('preview').src = target.result;
 
     // 清空所有输入
+    document.getElementById('file2').value = '';
     document.getElementById('message').value = '';
     document.getElementById('password').value = '';
     document.getElementById('password2').value = '';
@@ -57,6 +67,7 @@ const importImage = function (e) {
   };
 
   reader.readAsDataURL(e.target.files[0]);
+
 };
 
 // 导入需要加密的图片
@@ -74,10 +85,10 @@ const importImage2 = function (e) {
     document.getElementById('preview2').style.display = 'block';
     document.getElementById('preview2').src = result;
     if (result.length > maxMessageSize) {
-      alert('被加密图片不能超过0.9Kb,否则加密后信息会丢失！')
-    } else {
-      document.getElementById('message').value = result;
+      alert('被加密图片不要超过1Kb,否则加密时会严重卡顿，请不要操作！')
     }
+    document.getElementById('message').value = result;
+
   };
 
   reader.readAsDataURL(e.target.files[0]);
@@ -85,6 +96,8 @@ const importImage2 = function (e) {
 
 // 编码图像并保存
 const encode = function () {
+  console.time('encode');
+  loading.style.display = 'block';
   let message = document.getElementById('message').value;
   let password = document.getElementById('password').value;
   let output = document.getElementById('output');
@@ -117,6 +130,8 @@ const encode = function () {
   ctx.putImageData(imgData, 0, 0);
 
   output.src = canvas.toDataURL();
+  console.timeEnd('encode');
+  loading.style.display = 'none';
 
   // 加密成功
   alert('信息加密成功！右键另存为加密后的图像');
@@ -125,6 +140,8 @@ const encode = function () {
 
 // 如果有信息的话解密信息并展示
 const decode = function () {
+  loading.style.display = 'block';
+
   const password = document.getElementById('password2').value;
   const passwordFail = '密码不正确或没有加密的信息';
 
@@ -191,6 +208,8 @@ const decode = function () {
       content.innerHTML = escHtml(text);
     }
   }
+  loading.style.display = 'none';
+
 };
 
 // 返回位置中的二进制 0或1
