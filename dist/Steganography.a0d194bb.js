@@ -77,7 +77,7 @@ parcelRequire = (function (modules, cache, entry) {
 
   // Override the current require with this new one
   return newRequire;
-})({20:[function(require,module,exports) {
+})({5:[function(require,module,exports) {
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -523,7 +523,7 @@ sjcl.json = { defaults: { v: 1, iter: 1E3, ks: 128, ts: 64, mode: "ccm", adata: 
     var c = sjcl.misc.S,
         d;b = b || {};d = b.iter || 1E3;c = c[a] = c[a] || {};d = c[d] = c[d] || { firstSalt: b.salt && b.salt.length ? b.salt.slice(0) : sjcl.random.randomWords(2, 0) };c = b.salt === undefined ? d.firstSalt : b.salt;d[c] = d[c] || sjcl.misc.pbkdf2(a, c, b.iter);return { key: d[c].slice(0), salt: c.slice(0) };
 };
-},{}],4:[function(require,module,exports) {
+},{}],3:[function(require,module,exports) {
 // 引入sjcl加密库
 var sjcl = require('./sjcl');
 
@@ -543,7 +543,7 @@ window.onload = function () {
 };
 
 // 限制文本大小
-var maxMessageSize = 1000;
+var maxMessageSize = 1011; // 测试下来hash后的最大值,相当于0.986kb的数据
 
 // 把图片放入canvas画布
 var importImage = function importImage(e) {
@@ -571,8 +571,9 @@ var importImage = function importImage(e) {
       ctx.canvas.width = img.width;
       ctx.canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-
+      console.time('decode');
       decode();
+      console.timeEnd('decode');
     };
     img.src = target.result;
   };
@@ -604,7 +605,7 @@ var encode = function encode() {
 
   // 如果加密信息超过最大限制则终止
   if (message.length > maxMessageSize) {
-    alert('Message is too big.');
+    alert('信息过大！');
     return;
   }
 
@@ -635,7 +636,7 @@ var decode = function decode() {
     obj = JSON.parse(message);
   } catch (e) {
 
-    // display the "choose" view
+    // 显示 加密 / 解密
     document.getElementById('choose').style.display = 'block';
     document.getElementById('reveal').style.display = 'none';
 
@@ -673,7 +674,19 @@ var decode = function decode() {
         return escChars[c];
       });
     };
-    document.getElementById('messageDecoded').innerHTML = escHtml(obj.text);
+    var _obj = obj,
+        text = _obj.text;
+
+    var content = document.getElementById('messageDecoded');
+    // 兼容图像加密于图像中的结果
+    if (text.startsWith('data:image')) {
+      var img = new Image();
+      img.src = text;
+      content.innerHTML = '';
+      content.appendChild(img);
+    } else {
+      content.innerHTML = escHtml(text);
+    }
   }
 };
 
@@ -792,7 +805,7 @@ var decodeMessage = function decodeMessage(colors, hash) {
 
   return message.join('');
 };
-},{"./sjcl":20}],29:[function(require,module,exports) {
+},{"./sjcl":5}],12:[function(require,module,exports) {
 
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -822,7 +835,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '57592' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '53826' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
@@ -961,5 +974,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},[29,4])
+},{}]},{},[12,3])
 //# sourceMappingURL=/Steganography.a0d194bb.map

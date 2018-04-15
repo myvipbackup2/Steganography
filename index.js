@@ -17,7 +17,7 @@ window.onload = function () {
 };
 
 // 限制文本大小
-const maxMessageSize = Infinity;
+const maxMessageSize = 1011; // 测试下来hash后的最大值,相当于0.986kb的数据
 
 // 把图片放入canvas画布
 const importImage = function (e) {
@@ -43,8 +43,9 @@ const importImage = function (e) {
       ctx.canvas.width = img.width;
       ctx.canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-
+      console.time('decode');
       decode();
+      console.timeEnd('decode');
     };
     img.src = target.result;
   };
@@ -53,7 +54,7 @@ const importImage = function (e) {
 };
 
 // 编码图像并保存
-let encode = function () {
+const encode = function () {
   let message = document.getElementById('message').value;
   let password = document.getElementById('password').value;
   let output = document.getElementById('output');
@@ -76,12 +77,12 @@ let encode = function () {
 
   // 如果加密信息超过最大限制则终止
   if (message.length > maxMessageSize) {
-    alert('Message is too big.');
+    alert('信息过大！');
     return;
   }
 
   // 用输入的密码加密信息
-  let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   encodeMessage(imgData.data, sjcl.hash.sha256.hash(password), message);
   ctx.putImageData(imgData, 0, 0);
 
@@ -93,14 +94,14 @@ let encode = function () {
 };
 
 // 如果有信息的话解密信息并展示
-let decode = function () {
-  let password = document.getElementById('password2').value;
-  let passwordFail = '密码不正确或没有加密的信息';
+const decode = function () {
+  const password = document.getElementById('password2').value;
+  const passwordFail = '密码不正确或没有加密的信息';
 
   // 用提供的密码解码消息
-  let ctx = document.getElementById('canvas').getContext('2d');
-  let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  let message = decodeMessage(imgData.data, sjcl.hash.sha256.hash(password));
+  const ctx = document.getElementById('canvas').getContext('2d');
+  const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const message = decodeMessage(imgData.data, sjcl.hash.sha256.hash(password));
 
   // try to parse the JSON
   let obj = null;
@@ -108,7 +109,7 @@ let decode = function () {
     obj = JSON.parse(message);
   } catch (e) {
 
-    // display the "choose" view
+    // 显示 加密 / 解密
     document.getElementById('choose').style.display = 'block';
     document.getElementById('reveal').style.display = 'none';
 
@@ -141,12 +142,22 @@ let decode = function () {
       '/': '&#x2F;',
       '\n': '<br/>'
     };
-    let escHtml = function (string) {
+    const escHtml = function (string) {
       return String(string).replace(/[&<>"'\/\n]/g, function (c) {
         return escChars[c];
       });
     };
-    document.getElementById('messageDecoded').innerHTML = escHtml(obj.text);
+    const { text } = obj;
+    const content = document.getElementById('messageDecoded');
+    // 兼容图像加密于图像中的结果
+    if (text.startsWith('data:image')) {
+      const img = new Image();
+      img.src = text;
+      content.innerHTML = '';
+      content.appendChild(img)
+    } else {
+      content.innerHTML = escHtml(text);
+    }
   }
 };
 
@@ -162,7 +173,7 @@ const setBit = function (number, location, bit) {
 
 // 为一个2个字节的数字返回一个1和0的数组
 const getBitsFromNumber = function (number) {
-  let bits = [];
+  const bits = [];
   for (let i = 0; i < 16; i++) {
     bits.push(getBit(number, i));
   }
@@ -219,7 +230,7 @@ const encodeMessage = function (colors, hash, message) {
   messageBits = messageBits.concat(getMessageBits(message));
 
   // 存储我们已经修改的颜色值
-  let history = [];
+  const history = [];
 
   // 将这些bit编码成像素
   let pos = 0;
@@ -242,10 +253,10 @@ const encodeMessage = function (colors, hash, message) {
 // 返回在 CanvasPixel Array 'colors' 中编码的消息
 const decodeMessage = function (colors, hash) {
   // 存储我们已经读取的颜色值
-  let history = [];
+  const history = [];
 
   // 获取消息大小
-  let messageSize = getNumberFromBits(colors, history, hash);
+  const messageSize = getNumberFromBits(colors, history, hash);
 
   if ((messageSize + 1) * 16 > colors.length * 0.75) {
     return '';
@@ -256,9 +267,9 @@ const decodeMessage = function (colors, hash) {
   }
 
   // 把每个字符放入一个数组中
-  let message = [];
+  const message = [];
   for (let i = 0; i < messageSize; i++) {
-    let code = getNumberFromBits(colors, history, hash);
+    const code = getNumberFromBits(colors, history, hash);
     message.push(String.fromCharCode(code));
   }
 
