@@ -17,7 +17,7 @@ window.onload = function () {
 };
 
 // 限制文本大小
-const maxMessageSize = 1000;
+const maxMessageSize = Infinity;
 
 // 把图片放入canvas画布
 const importImage = function (e) {
